@@ -166,6 +166,7 @@ class BMDEstimateEdit extends React.Component {
     }
 
     render(){
+
         let isNew = (!this.state.id) ? true : false;
         return <BMDEstimateEditComponent
             priorWeights={this.getPriorWeightsFromObject()}

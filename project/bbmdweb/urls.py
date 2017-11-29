@@ -18,10 +18,9 @@ router.register(
     api.BMDAnalysisViewset,
     base_name="bmds")
 router.register(
-    # r'run/(?P<run_id>\d+)/lde',
-    r'lde',
+    r'run/(?P<run_id>\d+)/ldes',
     api.LowDoseExtrapolationViewset,
-    base_name="lde")
+    base_name="ldes")
 
 
 urlpatterns = [

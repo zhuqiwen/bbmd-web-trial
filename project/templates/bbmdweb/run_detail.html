@@ -13,6 +13,7 @@
         "run_root": "{% url 'bbmd:api:run-list' %}",
         "model_root": "{% url 'bbmd:api:models-list' run_id=object.id %}",
         "benchmark_dose_root": "{% url 'bbmd:api:bmds-list' run_id=object.id %}",
+        "low_dose_extrapolation_root": "{% url 'bbmd:api:ldes-list' run_id=object.id %}",
         "run_object": "{% url 'bbmd:api:run-detail' object.id %}",
         "user_id": {{request.user.id|default:"null"}},
         "csrf": "{{ csrf_token }}",

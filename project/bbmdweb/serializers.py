@@ -251,6 +251,9 @@ class BMDAnalysisSerializer(serializers.ModelSerializer):
 
 
 class LowDoseExtrapolationSerializer(serializers.ModelSerializer):
+    bmd_name = serializers.CharField(source='get_bmd_name', read_only=True)
+    stats_for_rfd = serializers.JSONField(source='stats_for_api', read_only=True)
+
     class Meta:
         model = models.LowDoesExtrapolation
         fields = "__all__"

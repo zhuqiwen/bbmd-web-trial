@@ -50,5 +50,10 @@ export const LDE_RECEIVE = 'LDE_RECEIVE';
 export const LDE_DELETE = 'LDE_DELETE';
 export const LDE_SELECT = 'LDE_SELECT';
 export const LDE_DESELECT = 'LDE_DESELECT';
+export const LDE_RECEIVE_ERRORS = 'LDE_RECEIVE_ERRORS';
+export const LDE_RESET_ERRORS = 'LDE_RESET_ERRORS';
+
+
+
 export const PLOT_LDE_REQUEST = 'PLOT_LDE_REQUEST';
 export const PLOT_LDE_RECEIVE = 'PLOT_LDE_RECEIVE';

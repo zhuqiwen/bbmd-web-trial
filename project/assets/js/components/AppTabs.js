@@ -169,9 +169,6 @@ class AppTabs extends React.Component {
     }
 
     render() {
-
-        console.log('components/apptabs -> render()');
-        console.log(this.props);
         let tabs = (this.props.isEditMode)?
             this.renderEditTabs():
             this.renderReadTabs();

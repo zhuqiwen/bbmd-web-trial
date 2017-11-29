@@ -25,6 +25,10 @@ from utils.models import PickledFileField
 
 from plotting import bkh
 
+import pandas as pd
+import pprint
+import json
+
 
 class Run(models.Model):
 
@@ -954,36 +958,106 @@ class BMDAnalysisModel(models.Model):
 
 
 class LowDoesExtrapolation(models.Model):
-    bmd_analysis_model = models.ForeignKey(
-        BMDAnalysisModel,
+    bmd = models.ForeignKey(
+        BMDAnalysis,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="low_dose_extrapolations")
+    run = models.ForeignKey(
+        Run,
+        on_delete=models.CASCADE,
+        null=True,
         related_name="low_dose_extrapolations")
     hd50_vector = PickledFileField(
         blank=True,
         null=True)
-    # {bw_a, bw_h}
-    bw_pair = ArrayField(
-        models.FloatField(),
-        size=10)
-    # {mu, std}
-    alpha_pair = ArrayField(
-        models.FloatField(),
-        size=10)
-    # {mu, std}
-    ahu_pair = ArrayField(
-        models.FloatField(),
-        size=10)
-    # {mu, std}
-    ou_pair = ArrayField(
-        models.FloatField(),
-        size=10)
+    ufa_m = models.FloatField(null=True)
+    ufa_s = models.FloatField(null=True)
+    ufh_m = models.FloatField(null=True)
+    ufh_s = models.FloatField(null=True)
+    ufs_m = models.FloatField(null=True)
+    ufs_s = models.FloatField(null=True)
+    ufd_m = models.FloatField(null=True)
+    ufd_s = models.FloatField(null=True)
+
+    # # {mu, std}
+    # ufa_pair = ArrayField(
+    #     models.FloatField(),
+    #     size=2)
+    # # {mu, std}
+    # ufh_pair = ArrayField(
+    #     models.FloatField(),
+    #     size=2)
+    # # {mu, std}
+    # ufs_pair = ArrayField(
+    #     models.FloatField(),
+    #     size=2)
+    # # {mu, std}
+    # ufd_pair = ArrayField(
+    #     models.FloatField(),
+    #     size=2)
+    name = models.CharField(
+        null=True,
+        max_length=128)
+    created = models.DateTimeField(
+        null=True,
+        auto_now_add=True)
+    last_updated = models.DateTimeField(
+        null=True,
+        auto_now=True)
 
     def result_to_lde(self):
         # load data from db and pickled file
         return dict(
-            bmd_analysis_model=self.bmd_analysis_model,
+            bmd_analysis=self.bmd,
             hd50_vector=self.hd50_vector.data,
         )
 
+
+
+    def get_bmd_name(self):
+        return self.bmd.name
+
+    def get_bmd_vector(self):
+        # with open(settings.MEDIA_ROOT + self.bmd.vectors, 'rb') as file:
+        #     vectors = pickle.load(file)
+        return self.bmd.vectors.data['extra_bmd']
+
+    def get_RfD_vec(self):
+        POD = self.get_bmd_vector()
+        vec_len = len(POD)
+        UF_a_vec = np.random.lognormal(self.ufa_m, self.ufa_s, vec_len)
+        UF_h_vec = np.random.lognormal(self.ufh_m, self.ufh_s, vec_len)
+        UF_s_vec = np.random.lognormal(self.ufs_m, self.ufs_s, vec_len)
+        UF_d_vec = np.random.lognormal(self.ufd_m, self.ufd_s, vec_len)
+        RfD_vec = POD / UF_a_vec / UF_h_vec / UF_s_vec / UF_d_vec
+        return RfD_vec
+
+    def get_statistics_for_rfd(self):
+        input_vector = self.get_RfD_vec()
+        out_vec = np.repeat(float('NaN'), 11)
+        percentile_vec = [1, 2.5, 5, 10, 25, 50, 75, 90, 95, 97.5, 99]
+        out_vec_dict = {}
+        for i in range(0, len(out_vec)):
+            out_vec[i] = np.percentile(input_vector, percentile_vec[i])
+            out_vec_dict[percentile_vec[i]] = out_vec[i]
+        # out_vec[0] = np.percentile(input_vector, 1)
+        # out_vec[1] = np.percentile(input_vector, 2.5)
+        # out_vec[2] = np.percentile(input_vector, 5)
+        # out_vec[3] = np.percentile(input_vector, 10)
+        # out_vec[4] = np.percentile(input_vector, 25)
+        # out_vec[5] = np.percentile(input_vector, 50)
+        # out_vec[6] = np.percentile(input_vector, 75)
+        # out_vec[7] = np.percentile(input_vector, 90)
+        # out_vec[8] = np.percentile(input_vector, 95)
+        # out_vec[9] = np.percentile(input_vector, 97.5)
+        # out_vec[10] = np.percentile(input_vector, 99)
+        return out_vec, out_vec_dict
+
+    def stats_for_api(self):
+        out_vec, out_vec_dict = self.get_statistics_for_rfd()
+        tmp = json.dumps(out_vec_dict)
+        return json.loads(tmp);
 
 
 

@@ -66,6 +66,7 @@ class BmdEstimatesEdit extends React.Component {
             selectedBmd = _.findWhere(
                 this.props.bmds.objects,
                 {id: this.props.bmds.selectedObjectId});
+
         return (
             <div className='row-fluid'>
                 <div className='col-sm-2'>

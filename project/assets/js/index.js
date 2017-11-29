@@ -35,8 +35,6 @@ class Root extends React.Component {
 
 
     render() {
-        console.log('index.js');
-        console.log(store.getState().run);
         return (
             <div>
                 <Provider store={store}>

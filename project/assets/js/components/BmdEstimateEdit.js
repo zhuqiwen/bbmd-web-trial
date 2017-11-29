@@ -286,6 +286,10 @@ class BmdEditEstimate extends React.Component {
             );
         }
 
+        console.log('components/bmdestimateedit.js -> render()');
+        console.log('this.props');
+        console.log(this.props);
+
 
         return (
             <div>

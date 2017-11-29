@@ -28,6 +28,8 @@ export default function (state = initialState, action) {
         case types.LDE_REQUEST:
             return state;
         case types.LDE_RECEIVE:
+            console.log('reducers/ldes.js -> lde_receive');
+            console.log(action.object);
             action.object.plot_json = undefined;
             index = state.objects.indexOf(
                 _.findWhere(state.objects, {id: action.object.id})
@@ -47,15 +49,33 @@ export default function (state = initialState, action) {
             }
             return Object.assign({}, state, {
                 isFetching: false,
-                selectedObjectId: null,
+                selectedObjectId: action.object.id,
                 objects,
             });
         case types.LDE_DELETE:
-            return state;
+            index = state.objects.indexOf(
+                _.findWhere(state.objects, {id: action.id})
+            );
+            if (index>=0){
+                objects = [
+                    ...state.objects.slice(0, index),
+                    ...state.objects.slice(index+1),
+                ];
+            }
+
+            return Object.assign({}, state, {
+                isFetching: false,
+                selectedObjectId: null,
+                objects,
+            });
         case types.LDE_SELECT:
-            return state;
+            return Object.assign({}, state, {
+                selectedObjectId: action.id,
+            });
         case types.LDE_DESELECT:
-            return state;
+            return Object.assign({}, state, {
+            selectedObjectId: null,
+        });
         case types.PLOT_LDE_REQUEST:
             return state;
         case types.PLOT_LDE_RECEIVE:

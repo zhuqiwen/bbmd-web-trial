@@ -43,7 +43,8 @@ export default function (state=defaultState, action) {
         }
         return Object.assign({}, state, {
             isFetching: false,
-            selectedObjectId: null,
+            // selectedObjectId: null,
+            selectedObjectId: action.object.id,
             objects,
         });
     case types.DELETE_BMD:
