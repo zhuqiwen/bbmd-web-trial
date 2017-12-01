@@ -27,7 +27,9 @@ class LowDoesExtrapolationEdit extends React.Component{
     }
 
     getDefaultObject(){
-        return {};
+        return {
+            run: this.props.run.id,
+        };
     }
 
     getFormState(object){
@@ -94,6 +96,9 @@ class LowDoesExtrapolationEdit extends React.Component{
         console.log('containers/ldeedit.js -> render');
         console.log('this.state  form values');
         console.log(this.state);
+        console.log("this.props-hahahahahah");
+        console.log(this.props);
+
 
         return (
             <LowDoseExtrapolationEditComponent
@@ -115,6 +120,7 @@ function mapStateToProps(state) {
     return {
         bmds: state.bmds,
         ldes: state.ldes,
+        run: state.run.object,
     };
 }
 

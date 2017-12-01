@@ -5,6 +5,7 @@ import _ from 'underscore';
 import {
     fetchLdesIfNeeded,
     changeSelectedLde,
+    fetchLdePlotIfNeeded
 } from '../actions/ldes';
 import LowDoseExtrapolationEdit from './LowDoseExtrapolationEdit';
 
@@ -16,6 +17,11 @@ class LowDoesExtrapolationsEdit extends React.Component{
     componentWillMount() {
         const { dispatch } = this.props;
         dispatch(fetchLdesIfNeeded());
+    }
+
+    onLdeMount(lde){
+        const { dispatch } = this.props;
+        dispatch(fetchLdePlotIfNeeded(lde));
     }
 
     handlePillsClick(e){
@@ -73,7 +79,6 @@ class LowDoesExtrapolationsEdit extends React.Component{
             <div className='row-fluid'>
                 <div className='col-sm-2'>
                     <ul className='nav nav-pills nav-stacked' data-items={ldes_len}>
-                    {/*<ul className='nav nav-pills nav-stacked'>*/}
                         {ldes.map(this.renderPills.bind(this))}
                         {this.renderAddNewButton()}
                     </ul>
@@ -82,6 +87,7 @@ class LowDoesExtrapolationsEdit extends React.Component{
                     <div className='tab-content'>
                         <LowDoseExtrapolationEdit
                             selectedLde={selectedLde}
+                            onLdeMount={this.onLdeMount.bind(this)}
                         />
                     </div>
                 </div>

@@ -24,6 +24,8 @@ from bbmd.bmr import continuous as cbmr, \
 from utils.models import PickledFileField
 
 from plotting import bkh
+import scipy.stats as stats
+
 
 import pandas as pd
 import pprint
@@ -1013,8 +1015,6 @@ class LowDoesExtrapolation(models.Model):
             hd50_vector=self.hd50_vector.data,
         )
 
-
-
     def get_bmd_name(self):
         return self.bmd.name
 
@@ -1023,7 +1023,7 @@ class LowDoesExtrapolation(models.Model):
         #     vectors = pickle.load(file)
         return self.bmd.vectors.data['extra_bmd']
 
-    def get_RfD_vec(self):
+    def get_rfd_vec(self):
         POD = self.get_bmd_vector()
         vec_len = len(POD)
         UF_a_vec = np.random.lognormal(self.ufa_m, self.ufa_s, vec_len)
@@ -1034,7 +1034,7 @@ class LowDoesExtrapolation(models.Model):
         return RfD_vec
 
     def get_statistics_for_rfd(self):
-        input_vector = self.get_RfD_vec()
+        input_vector = self.get_rfd_vec()
         out_vec = np.repeat(float('NaN'), 11)
         percentile_vec = [1, 2.5, 5, 10, 25, 50, 75, 90, 95, 97.5, 99]
         out_vec_dict = {}
@@ -1057,7 +1057,26 @@ class LowDoesExtrapolation(models.Model):
     def stats_for_api(self):
         out_vec, out_vec_dict = self.get_statistics_for_rfd()
         tmp = json.dumps(out_vec_dict)
-        return json.loads(tmp);
+        return json.loads(tmp)
+
+    def get_plot_url(self):
+        return reverse('bbmd:api:ldes-plot', args=(self.run.id, self.id, ))
+
+    def get_plot_data(self):
+        rfd = self.get_rfd_vec()
+        rfd_vec_lower = np.percentile(rfd, 0.1)
+        rfd_vec_upper = np.percentile(rfd, 99.9)
+        plot_rfd_vec = np.r_[rfd_vec_lower:rfd_vec_upper:1024j]
+        rfd_vec_density = stats.gaussian_kde(rfd)
+        return {
+            'plot_rfd_vec': plot_rfd_vec,
+            'rfd_vec_density': rfd_vec_density
+        }
+
+    def get_plot(self):
+        data = self.get_plot_data()
+        plot = bkh.LowDoseExtrapolationPlot(data)
+        return plot.as_json()
 
 
 

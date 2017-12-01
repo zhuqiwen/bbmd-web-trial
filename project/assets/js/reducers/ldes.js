@@ -76,10 +76,22 @@ export default function (state = initialState, action) {
             return Object.assign({}, state, {
             selectedObjectId: null,
         });
-        case types.PLOT_LDE_REQUEST:
+        case types.LDE_PLOT_REQUEST:
             return state;
-        case types.PLOT_LDE_RECEIVE:
-            return state;
+        case types.LDE_PLOT_RECEIVE:
+            isFetchingPlot = Object.assign({}, state.isFetchingPlot);
+            delete isFetchingPlot[action.plot_id];
+            model = _.findWhere(state.objects, {id: action.plot_id});
+            index = state.objects.indexOf(model);
+            objects = [
+                ...state.objects.slice(0, index),
+                _.extend({}, model, {plot_json: action.plot_json}),
+                ...state.objects.slice(index+1),
+            ];
+            return Object.assign({}, state, {
+                objects,
+                isFetchingPlot,
+            });
         default:
             return state;
     }

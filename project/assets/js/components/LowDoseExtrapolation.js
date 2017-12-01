@@ -1,12 +1,25 @@
 import React from 'react';
+import ModelFitPlot from './ModelFitPlot';
+
 
 
 
 class LowDoseExtrapolation extends React.Component{
 
+    componentWillMount(){
+        this.props.onMount(this.props.object);
+    }
+
+    componentDidUpdate(){
+        this.props.onMount(this.props.object);
+    }
+
     render(){
         let object = this.props.object;
         let statistics = object.stats_for_rfd;
+
+        console.log('lowdoseextrapolation.js -> render()');
+        console.log(object);
         return (
             <div>
                 <div>
@@ -59,22 +72,10 @@ class LowDoseExtrapolation extends React.Component{
                         <th>99%</th>
                         <td>{statistics[99]}</td>
                       </tr>
-                      <tr>
-
-
-
-
-
-
-
-
-
-
-
-
-                      </tr>
                     </table>
                 </div>
+                <ModelFitPlot plot_json={object.plot_json} />
+
             </div>
 
 

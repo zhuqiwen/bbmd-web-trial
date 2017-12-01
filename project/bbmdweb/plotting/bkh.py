@@ -4,6 +4,7 @@ import numpy as np
 from copy import deepcopy
 from bokeh.models import HoverTool
 from bokeh.models.ranges import DataRange1d
+from bokeh.models.formatters import LogTickFormatter
 from bokeh.plotting import figure, ColumnDataSource
 from bokeh.embed import _standalone_docs_json_and_render_items
 from bokeh.model import _ModelInDocument
@@ -346,3 +347,26 @@ class BenchmarkDosePlot(Plot):
 
     def set_metadata(self):
         pass
+
+
+class LowDoseExtrapolationPlot(Plot):
+    def set_data(self):
+        pass
+
+    def set_metadata(self):
+        x = self.data['plot_rfd_vec']
+        density_func = self.data['rfd_vec_density']
+        y = density_func(x)
+        fig = figure(
+            width=800, plot_height=600,
+            title="Los Dose Extrapolation",
+            x_axis_type='log'
+        )
+        fig.line(
+            x, y,
+            line_width=2
+        )
+        self.plot = fig
+        self.plot.xaxis.formatter = LogTickFormatter()
+
+

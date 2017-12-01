@@ -195,6 +195,23 @@ class BMDAnalysisViewset(OwnedButSharablePermission, viewsets.ModelViewSet):
 class LowDoseExtrapolationViewset(OwnedButSharablePermission, viewsets.ModelViewSet):
 
     serializer_class = serializers.LowDoseExtrapolationSerializer
-    queryset = models.LowDoesExtrapolation.objects.all()
     # filter_backends = (filters.DjangoFilterBackend,)
+
+    def get_queryset(self):
+        run = get_object_or_404(models.Run, id=self.kwargs.get('run_id'))
+        if not run.user_can_view(self.request.user):
+            return models.LowDoesExtrapolation.objects.none()
+        return models.LowDoesExtrapolation.objects\
+            .filter(run=run)\
+            .order_by('created')
+
+
+    @detail_route(methods=['get'], renderer_classes=(PlottingJSONRenderer,))
+    def plot(self, request, pk=None, run_id=None):
+        obj = get_object_or_404(models.LowDoesExtrapolation, id=pk)
+        if not self.check_object_permissions(request, obj):
+            raise Http404()
+        # an dedicated get_plot() of the obj should be used here
+        data = obj.get_plot()
+        return Response(data)
 

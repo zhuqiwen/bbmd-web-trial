@@ -76,6 +76,7 @@ class LowDoseExtrapolationEdit extends React.Component{
                 <div>
                     <LowDoseExtrapolation
                     object={this.props.object}
+                    onMount={this.props.onLdeMount.bind(this)}
                     />
                     <hr/>
                 </div>
@@ -98,6 +99,7 @@ class LowDoseExtrapolationEdit extends React.Component{
                         className="form-control"
                         name="bmd"
                         onChange={this.props.handleFieldChange}>
+                        <option selected="selected">Select A BMD Estimate</option>
                         {this.renderBmdOptions(bmds)}
                     </select>
                 </div>

@@ -12,12 +12,32 @@ function receiveLdes(data){
 }
 
 
+
+function requestLdePlot(id) {
+    return {
+        type: types.LDE_PLOT_REQUEST,
+        id,
+    };
+}
+
+
+function receiveLdePlot(id, json) {
+    return {
+        type: types.LDE_PLOT_RECEIVE,
+        plot_id: id,
+        plot_json: json,
+    };
+}
+
+
 function fetchLdes() {
     return (dispatch, getState) => {
         let state = getState();
         return fetch(state.config.low_dose_extrapolation_root, h.fetchGet)
             .then(response => response.json())
-            .then(json => dispatch(receiveLdes(json)))
+            .then(json => {
+                dispatch(receiveLdes(json));
+            })
             .catch((ex) => console.error('LDES parsing failed', ex));
     };
 }
@@ -27,6 +47,21 @@ function fetchLdes() {
 export function fetchLdesIfNeeded() {
     return (dispatch, getState) => {
         return dispatch(fetchLdes());
+    };
+}
+
+
+export function fetchLdePlotIfNeeded(lde) {
+    if (!lde.id) return;
+    if (!_.isUndefined(lde.plot_json)) return;
+    return (dispatch, getState) => {
+        let state = getState();
+        if (state.ldes.isFetchingPlot[lde.id]) return;
+        dispatch(requestLdePlot(lde.id));
+        return fetch(lde.url_plot, h.fetchGet)
+            .then(response => response.json())
+            .then(json => dispatch(receiveLdePlot(lde.id, json)))
+            .catch((ex) => console.error('Low Dose Extrapolation plot parsing failed', ex));
     };
 }
 
